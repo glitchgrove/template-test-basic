@@ -1,0 +1,54 @@
+default_visibility = "private"
+
+[template]
+name = "template-test-basic"
+description = "Basic test template for RepoRoller integration tests"
+author = "RepoRoller Test Suite"
+tags = ["test", "basic"]
+
+# Template-specific labels (in addition to global labels)
+[[labels]]
+name = "template-feature"
+color = "fbca04"
+description = "Feature label from template-test-basic"
+
+[[labels]]
+name = "template-bug"
+color = "dea584"
+description = "Bug label from template-test-basic"
+
+# Template-specific webhooks (in addition to global webhooks)
+[[webhooks]]
+url = "https://httpbin.org/template-webhook"
+content_type = "json"
+active = true
+events = ["issues", "issue_comment"]
+secret = "template-basic-webhook-secret-456"
+
+# Template-specific teams (merged with org-level default_teams).
+# 'reporoller-test-triage' is created by tests/create-test-teams.ps1.
+# This entry UPGRADES the 'reporoller-test-triage' team (not present in global
+# defaults, so it is a new entry for this template).
+[[teams]]
+slug = "reporoller-test-triage"
+access_level = "triage"
+
+# This entry attempts to UPGRADE 'reporoller-test-permissions' from the org's
+# 'triage' default to 'write' — valid because it is an upgrade, not a demotion.
+[[teams]]
+slug = "reporoller-test-permissions"
+access_level = "write"
+
+# Template-level naming rule — merged additively with the org-level rule
+# in tests/metadata/.reporoller/global/defaults.toml.
+#
+# This rule is used by E2E concatenation tests to verify that naming rules
+# from both global config and template config are enforced together:
+#   - Names containing 'badtemplate' are rejected with 400 Bad Request
+#     (violates template rule only).
+#   - Names containing 'noncompliant' are rejected with 400 Bad Request
+#     (violates global rule only).
+#   - Names containing neither are accepted (satisfies both rules).
+[[naming_rules]]
+description = "Template naming policy: names must not contain 'badtemplate'"
+forbidden_patterns = ["badtemplate"]
